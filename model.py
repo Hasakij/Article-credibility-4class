@@ -18,7 +18,7 @@ class Classifier(nn.Module):
 		self.relu = nn.ReLU()
 		self.pool = nn.MaxPool1d(kernel_size=2)
 
-		# LSTM layer
+		# BiLSTM layer
 		self.lstm = nn.LSTM(input_size=num_filters, hidden_size=lstm_hidden,
 							num_layers=1, batch_first=True, bidirectional=True)
 		self.dropout = nn.Dropout(0.5)
@@ -47,7 +47,7 @@ class Classifier(nn.Module):
 		features = self.relu(features)
 		features = self.pool(features)			# [batch, num_filters, seq_len // 2]
 
-		# back to LSTM format
+		# Prepare features for BiLSTM
 		features = features.permute(0,2,1)
 		lstm_out, (h_n, c_n) = self.lstm(features)
 
