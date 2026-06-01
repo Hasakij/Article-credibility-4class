@@ -1,0 +1,10 @@
+comet_ml==3.58.0
+langdetect==1.0.9
+numpy==1.26.4
+pandas==2.2.3
+pdfplumber==0.11.9
+scikit-learn==1.6.1
+spacy==3.8.14
+torch==2.5.1
+trafilatura==2.0.0
+transformers==5.9.0
