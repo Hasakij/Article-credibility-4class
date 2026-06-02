@@ -6,12 +6,13 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 import comet_ml
 from comet_ml.integration.pytorch import log_model
+import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score, average_precision_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score, average_precision_score, classification_report, ConfusionMatrixDisplay
 from transformers import AutoTokenizer
 from dotenv import load_dotenv
 
@@ -134,6 +135,8 @@ early_stop_patience = 3
 counter = 0
 train_start = time.time()
 
+train_losses = []
+val_losses = []
 
 # Training and validation
 for epoch in range(hyper_params["epochs"]):
@@ -156,6 +159,7 @@ for epoch in range(hyper_params["epochs"]):
 		running_train_loss += loss.item()
 
 	epoch_train_loss = running_train_loss / len(train_loader)
+	train_losses.append(epoch_train_loss)
 	print(f"Epoch [{epoch+1}/{hyper_params['epochs']}] \ntrain loss: {epoch_train_loss:.4f}")
 	experiment.log_metric("train_loss", epoch_train_loss, epoch=epoch)
 
@@ -180,6 +184,7 @@ for epoch in range(hyper_params["epochs"]):
 			all_labels.extend(labels.cpu().numpy().ravel())
 
 	epoch_val_loss = running_val_loss / len(val_loader)
+	val_losses.append(epoch_val_loss)
 
 	# Validation metrics
 	val_accuracy = accuracy_score(all_labels, all_preds)
@@ -268,6 +273,39 @@ experiment.log_confusion_matrix(matrix=test_conf_matrix, labels=["TRUE", "FAKE",
 print(f"Test classification report: \n{test_report}")
 
 print(f"Training time: {(train_end - train_start) / 60:.2f} min")
+
+os.makedirs("images", exist_ok=True)
+
+# Save and log confusion matrix
+disp = ConfusionMatrixDisplay(confusion_matrix=test_conf_matrix, display_labels=["TRUE", "FAKE", "SATIRE", "BIAS"])
+
+fig, ax = plt.subplots(figsize=(8, 6))
+disp.plot(ax=ax, cmap="Blues", values_format="d")
+plt.title("Test Confusion Matrix")
+plt.tight_layout()
+
+conf_matrix_path = "images/confusion_matrix.png"
+plt.savefig(conf_matrix_path, dpi=300)
+
+experiment.log_image(image_data=conf_matrix_path, name="confusion_matrix.png")
+plt.close(fig)
+
+# Save and log loss curve
+fig, ax = plt.subplots(figsize=(8, 5))
+ax.plot(train_losses, marker="o", label="Train loss")
+ax.plot(val_losses, marker="o", label="Validation loss")
+ax.set_xlabel("Epoch")
+ax.set_ylabel("Loss")
+ax.set_title("Training and Validation Loss")
+ax.legend()
+ax.grid(True)
+plt.tight_layout()
+
+loss_curve_path = "images/loss_curve.png"
+plt.savefig(loss_curve_path, dpi=300)
+
+experiment.log_image(image_data=loss_curve_path, name="loss_curve.png")
+plt.close(fig)
 
 print("Saving model to Comet ML...")
 log_model(experiment, model=model, model_name="fake-news")

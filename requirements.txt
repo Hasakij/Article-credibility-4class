@@ -1,5 +1,6 @@
 comet_ml==3.58.0
 langdetect==1.0.9
+matplotlib==3.10.3
 numpy==1.26.4
 pandas==2.2.3
 pdfplumber==0.11.9
