@@ -104,16 +104,6 @@ Classify PDF:
 python3 predict.py --pdf article.pdf
 ```
 
-Example output:
-
-```text
-Prediction: SATIRE
-REAL probability: 0.08
-FAKE probability: 0.02
-SATIRE probability: 0.90
-BIAS probability: 0.00
-```
-
 ## Evaluation Metrics
 
 The model is evaluated using:
@@ -126,24 +116,42 @@ The model is evaluated using:
 - Classification Report
 
 ## Example performance
-Final evaluation on the test set:
+Final Test Results
 
-```text
-Accuracy: 0.81
-Macro Precision: 0.82
-Macro Recall: 0.85
-Macro F1-score: 0.81
-```
+| Metric            | Value |
+| ----------------- | ----- |
+| Loss              | 0.36  |
+| Accuracy          | 0.81  |
+| Precision (Macro) | 0.82  |
+| Recall (Macro)    | 0.85  |
+| F1-score (Macro)  | 0.81  |
 
-Class-wise F1-scores:
+## Class-wise F1-score
 
-```text
-TRUE   : 0.86
-FAKE   : 0.83
-SATIRE : 0.98
-BIAS   : 0.58
-```
-The model performs very well on SATIRE class, while the BIAS class is sometimes confused with TRUE and FAKE classes
+| Class  | F1-score |
+| ------ | -------- |
+| TRUE   | 0.86     |
+| FAKE   | 0.83     |
+| SATIRE | 0.98     |
+| BIAS   | 0.58     |
+
+
+The model performs well on TRUE,FAKE, SATIRE classes, while the BIAS class remains the most challenging due to overlap with with factual and misleading content.
+### Confusion Matrix
+
+![Confusion Matrix](images/confusion_matrix.png)
+
+### Training and Validation Loss
+
+![Loss Curve](images/loss_curve.png)
+
+## Experiment Tracking
+
+Experiments were tracked with Comet ML.
+
+Comet ML dashboard:
+https://www.comet.com/hasakij/fake-news/view/new/panels
+
 ## Requirements
 
 Main libraries:
