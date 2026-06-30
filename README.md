@@ -172,9 +172,11 @@ The repository ignores:
 
 ```text
 .env
+archive/
 best_model.pt
 dataset/
 __pycache__/
 *.pyc
+*_metrics.py
 test.py
 ```
