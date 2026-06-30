@@ -2,6 +2,8 @@
 __pycache__/
 *.pyc
 
+archive/
+ocr_images/
 dataset/
 best_model.pt
 *_metrics.csv
